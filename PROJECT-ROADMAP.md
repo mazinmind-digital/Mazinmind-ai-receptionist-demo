@@ -4,6 +4,9 @@ Updated: 2026-10-31
 
 ## Current state
 
+- Public demo: https://mazinmind-digital.github.io/Mazinmind-ai-receptionist-demo/
+- Latest Pages workflow run: successful on 2026-10-31.
+
 - [x] Repository exists: `mazinmind-digital/Mazinmind-ai-receptionist-demo`
 - [x] Static responsive interface added (`index.html`, `styles.css`, `app.js`)
 - [x] Demo business profiles: HVAC/plumbing, auto repair, general service
@@ -13,8 +16,9 @@ Updated: 2026-10-31
 - [x] Verified all core files can be read back from GitHub
 - [x] Identified first workflow failure: GitHub Pages site was not enabled/configured for the custom workflow
 - [x] Updated Pages workflow to allow the Pages setup action to enable Pages
-- [ ] Verify the latest Pages workflow run completes successfully
-- [ ] Confirm the public site URL and open it on mobile
+- [x] Verify the latest Pages workflow run completes successfully
+- [x] Confirm the public site URL from the successful deployment logs
+- [ ] Open the published site on mobile
 - [ ] Manually test the chat, lead form, dashboard filters/status changes, and settings
 - [ ] Add automated smoke checks and JavaScript syntax validation to CI
 

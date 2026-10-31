@@ -1,0 +1,13 @@
+{
+  "name": "mazinmind-ai-receptionist-demo",
+  "private": true,
+  "version": "0.2.0",
+  "description": "MazinMind AI receptionist demo and Cloudflare Workers API",
+  "type": "module",
+  "scripts": {
+    "test:api": "node --test tests/backend.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -17,7 +17,7 @@ function request(path, { method = "GET", body, headers = {} } = {}) {
 test("health endpoint reports AI binding state without leaking configuration", async () => {
   const response = await handleRequest(request("/health"), {});
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { ok: true, service: "mazinmind-receptionist-api", mode: "ai-unavailable" });
+  assert.deepEqual(await response.json(), { ok: true, service: "mazinmind-receptionist-api", mode: "ok" });
 });
 
 test("unknown route returns stable JSON error", async () => {
@@ -45,28 +45,69 @@ test("chat validates message length and presence", async () => {
 });
 
 test("chat returns graceful 503 when Workers AI binding is missing", async () => {
-  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "I need a plumber" } }), {});
-  assert.equal(response.status, 503);
-  assert.equal((await response.json()).error.code, "AI_UNAVAILABLE");
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ success: true }), { status: 200 });
+  try {
+    const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "I need a plumber", turnstileToken: "valid-test-token" } }), { TURNSTILE_SECRET_KEY: "test-secret" });
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).error.code, "AI_UNAVAILABLE");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("chat fails closed when Turnstile token or server secret is missing", async () => {
+  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" } }), {
+    AI: { run: async () => ({ response: "must not run" }) },
+  });
+  assert.equal(response.status, 403);
+  assert.equal((await response.json()).error.code, "CHALLENGE_REQUIRED");
+});
+
+test("chat rejects an invalid Turnstile response", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ success: false }), { status: 200 });
+  try {
+    const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello", turnstileToken: "bad-token" } }), {
+      TURNSTILE_SECRET_KEY: "test-secret",
+      AI: { run: async () => ({ response: "must not run" }) },
+    });
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error.code, "CHALLENGE_REQUIRED");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("chat invokes the provider adapter and returns normalized reply", async () => {
   let calledWith;
-  const env = { AI: { run: async (model, input) => { calledWith = { model, input }; return { response: "I can help collect the service details." }; } } };
-  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "I need a plumber", profile: "hvac" } }), env);
-  assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { reply: "I can help collect the service details.", provider: "cloudflare-workers-ai" });
-  assert.equal(calledWith.model, "@cf/meta/llama-3.1-8b-instruct");
-  assert.equal(calledWith.input.messages[1].content, "I need a plumber");
-  assert.match(calledWith.input.messages[0].content, /Never invent prices/);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ success: true }), { status: 200 });
+  try {
+    const env = { TURNSTILE_SECRET_KEY: "test-secret", AI: { run: async (model, input) => { calledWith = { model, input }; return { response: "I can help collect the service details." }; } } };
+    const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "I need a plumber", profile: "hvac", turnstileToken: "valid-test-token" } }), env);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { reply: "I can help collect the service details.", provider: "cloudflare-workers-ai" });
+    assert.equal(calledWith.model, "@cf/meta/llama-3.1-8b-instruct");
+    assert.equal(calledWith.input.messages[1].content, "I need a plumber");
+    assert.match(calledWith.input.messages[0].content, /Never invent prices/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("provider failures are hidden behind a stable error response", async () => {
-  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "Need help" } }), { AI: { run: async () => { throw new Error("private upstream detail"); } } });
-  assert.equal(response.status, 502);
-  const data = await response.json();
-  assert.equal(data.error.code, "MODEL_PROVIDER_ERROR");
-  assert.doesNotMatch(JSON.stringify(data), /private upstream detail/);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ success: true }), { status: 200 });
+  try {
+    const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "Need help", turnstileToken: "valid-test-token" } }), { TURNSTILE_SECRET_KEY: "test-secret", AI: { run: async () => { throw new Error("private upstream detail"); } } });
+    assert.equal(response.status, 502);
+    const data = await response.json();
+    assert.equal(data.error.code, "MODEL_PROVIDER_ERROR");
+    assert.doesNotMatch(JSON.stringify(data), /private upstream detail/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("configured CORS origin receives explicit allow-origin header", async () => {
@@ -75,7 +116,7 @@ test("configured CORS origin receives explicit allow-origin header", async () =>
 });
 
 test("unapproved browser origin is rejected", async () => {
-  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" }, headers: { Origin: "https://attacker.example" } }), { AI: { run: async () => ({ response: "no" }) } });
+  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" }, headers: { Origin: "https://attacker.example" } }), { TURNSTILE_SECRET_KEY: "test-secret", AI: { run: async () => ({ response: "no" }) } });
   assert.equal(response.status, 403);
   assert.equal((await response.json()).error.code, "ORIGIN_NOT_ALLOWED");
 });

@@ -50,6 +50,30 @@ function rateLimited(request, env) {
   return current.count > limit;
 }
 
+async function verifyTurnstile(token, request, env) {
+  // Fail closed: a public endpoint must not silently bypass the challenge when
+  // the server-side secret is missing or Siteverify is unavailable.
+  if (!env.TURNSTILE_SECRET_KEY || typeof token !== "string" || !token.trim()) return false;
+  try {
+    const form = new URLSearchParams({
+      secret: env.TURNSTILE_SECRET_KEY,
+      response: token,
+    });
+    const ip = request.headers.get("CF-Connecting-IP");
+    if (ip) form.set("remoteip", ip);
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: form.toString(),
+    });
+    if (!response.ok) return false;
+    const result = await response.json();
+    return result.success === true;
+  } catch {
+    return false;
+  }
+}
+
 function systemPrompt(profile) {
   const profiles = {
     hvac: "The business handles HVAC and plumbing inquiries.",
@@ -85,7 +109,7 @@ export async function handleRequest(request, env = {}) {
   }
 
   if (url.pathname === "/health" && request.method === "GET") {
-    return json({ ok: true, service: "mazinmind-receptionist-api", mode: env.AI ? "ai-configured" : "ai-unavailable" }, 200, cors);
+    return json({ ok: true, service: "mazinmind-receptionist-api", mode: "ok" }, 200, cors);
   }
 
   if (url.pathname !== "/api/v1/chat" || request.method !== "POST") {
@@ -123,6 +147,11 @@ export async function handleRequest(request, env = {}) {
 
   if (!body || typeof body.message !== "string" || !body.message.trim() || body.message.length > MAX_MESSAGE_LENGTH) {
     return json({ error: { code: "INVALID_REQUEST", message: "message is required and must be 1–2000 characters." } }, 400, cors);
+  }
+
+  const turnstileValid = await verifyTurnstile(body.turnstileToken, request, env);
+  if (!turnstileValid) {
+    return json({ error: { code: "CHALLENGE_REQUIRED", message: "Please complete the security check and try again." } }, 403, cors);
   }
 
   const profile = ["hvac", "auto", "general"].includes(body.profile) ? body.profile : "general";

@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'worker/**'
-      - 'tests/backend.test.*'
+      - 'api-api-tests/backend.test.mjs'
       - 'wrangler.toml'
       - 'package.json'
       - '.github/workflows/backend-api.yml'
@@ -12,7 +12,7 @@ on:
     branches: [main]
     paths:
       - 'worker/**'
-      - 'tests/backend.test.*'
+      - 'api-api-tests/backend.test.mjs'
       - 'wrangler.toml'
       - 'package.json'
       - '.github/workflows/backend-api.yml'
@@ -29,4 +29,4 @@ jobs:
         with:
           node-version: 22
       - name: Run backend API tests
-        run: node --test tests/backend.test.mjs
+        run: node --test api-tests/backend.test.mjs

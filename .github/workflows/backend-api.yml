@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'worker/**'
-      - 'api-api-tests/backend.test.mjs'
+      - 'api-tests/backend.test.mjs'
       - 'wrangler.toml'
       - 'package.json'
       - '.github/workflows/backend-api.yml'
@@ -12,7 +12,7 @@ on:
     branches: [main]
     paths:
       - 'worker/**'
-      - 'api-api-tests/backend.test.mjs'
+      - 'api-tests/backend.test.mjs'
       - 'wrangler.toml'
       - 'package.json'
       - '.github/workflows/backend-api.yml'

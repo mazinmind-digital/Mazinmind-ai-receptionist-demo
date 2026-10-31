@@ -4,7 +4,9 @@ compatibility_date = "2026-10-31"
 workers_dev = true
 
 [vars]
-# Comma-separated exact origins. Update this list before deployment.\n# Configure the server-side Turnstile secret with: npx wrangler secret put TURNSTILE_SECRET_KEY\n# Never put the Turnstile secret in vars, frontend JavaScript, or source control.
+# Comma-separated exact origins. Update this list before deployment.
+# Configure the server-side Turnstile secret with: npx wrangler secret put TURNSTILE_SECRET_KEY
+# Never put the Turnstile secret in vars, frontend JavaScript, or source control.
 ALLOWED_ORIGINS = "https://mazinmind-digital.github.io,http://localhost:8080,http://127.0.0.1:8080"
 RATE_LIMIT_PER_MINUTE = "20"
 AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"

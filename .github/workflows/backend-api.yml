@@ -1,0 +1,32 @@
+name: Backend API tests
+
+on:
+  pull_request:
+    paths:
+      - 'worker/**'
+      - 'api-tests/backend.test.mjs'
+      - 'wrangler.toml'
+      - 'package.json'
+      - '.github/workflows/backend-api.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'worker/**'
+      - 'api-tests/backend.test.mjs'
+      - 'wrangler.toml'
+      - 'package.json'
+      - '.github/workflows/backend-api.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run backend API tests
+        run: node --test api-tests/backend.test.mjs

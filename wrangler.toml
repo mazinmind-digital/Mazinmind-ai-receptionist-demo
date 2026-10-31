@@ -1,0 +1,13 @@
+name = "mazinmind-receptionist-api"
+main = "worker/src/index.js"
+compatibility_date = "2026-10-31"
+workers_dev = true
+
+[vars]
+# Comma-separated exact origins. Update this list before deployment.
+ALLOWED_ORIGINS = "https://mazinmind-digital.github.io,http://localhost:8080,http://127.0.0.1:8080"
+RATE_LIMIT_PER_MINUTE = "20"
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+
+[ai]
+binding = "AI"

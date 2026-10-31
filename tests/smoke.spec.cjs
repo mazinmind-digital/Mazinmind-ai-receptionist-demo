@@ -33,14 +33,20 @@ test('saves missed-call lead and displays it in dashboard', async ({ page }) => 
 });
 
 test('persists settings and leads after reload', async ({ page }) => {
+  // Settings fields are inside a hidden view until the Settings tab is selected.
+  await page.getByRole('button', { name: /settings/i }).click();
   await page.locator('#business-name').fill('Test Service Co');
   await page.locator('#business-description').fill('Playwright smoke test');
   await page.getByRole('button', { name: /save settings/i }).click();
+
+  await page.getByRole('button', { name: /live demo/i }).click();
   await page.locator('#caller-name').fill('Morgan Test');
   await page.locator('#caller-contact').fill('morgan@example.com');
   await page.locator('#caller-service').fill('Routine service');
   await page.getByRole('button', { name: /save demo lead/i }).click();
+
   await page.reload();
+  await page.getByRole('button', { name: /settings/i }).click();
   await expect(page.locator('#business-name')).toHaveValue('Test Service Co');
   await page.getByRole('button', { name: /leads/i }).first().click();
   await expect(page.locator('#lead-list')).toContainText('Morgan Test');
@@ -48,9 +54,10 @@ test('persists settings and leads after reload', async ({ page }) => {
 
 test('chat captures a lead and flags urgent requests', async ({ page }) => {
   await page.locator('#message').fill('My name is Alex and I need urgent furnace repair');
-  await page.locator('#chat-form button[type="submit"]').click();
+  // The button is a submit button by HTML default; it does not declare type="submit".
+  await page.locator('#chat-form button').click();
   await page.locator('#message').fill('alex@example.com');
-  await page.locator('#chat-form button[type="submit"]').click();
+  await page.locator('#chat-form button').click();
   await expect(page.locator('#lead-count')).toHaveText('1');
   await page.getByRole('button', { name: /leads/i }).first().click();
   await expect(page.locator('#lead-list')).toContainText('Alex');

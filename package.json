@@ -5,7 +5,7 @@
   "description": "MazinMind AI receptionist demo and Cloudflare Workers API",
   "type": "module",
   "scripts": {
-    "test:api": "node --test tests/backend.test.cjs"
+    "test:api": "node --test tests/backend.test.mjs"
   },
   "engines": {
     "node": ">=20"

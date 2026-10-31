@@ -1,9 +1,84 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081321"><meta name="description" content="Interactive MazinMind AI receptionist demo for service businesses."><title>MazinMind AI Receptionist Demo</title><link rel="stylesheet" href="styles.css"></head>
-<body><header class="top"><a class="brand" href="#"><span class="mark">M</span><span><b>MazinMind</b><small>AI RECEPTIONIST</small></span></a><a class="button ghost" href="https://mazinmind.digital" target="_blank" rel="noreferrer">MazinMind.digital ↗</a></header>
-<main><section class="hero"><div><p class="eyebrow">NEVER LET A LEAD GO COLD</p><h1>Every call matters.<br><em>Every lead gets a response.</em></h1><p class="intro">Explore a practical receptionist concept for service businesses. Answer common questions, capture customer details, and preview missed-call follow-up.</p><div class="actions"><button class="button primary" data-view="demo">Try the demo ↓</button><button class="button" data-view="leads">View lead dashboard</button></div><p class="note">✓ Demo mode only. No calls or texts are sent.</p></div><aside class="summary"><div class="summary-head"><span>● Receptionist overview</span><span class="pill">SIMULATED</span></div><div class="metrics"><div><small>Leads captured</small><strong id="lead-count">0</strong><small>This browser only</small></div><div><small>Availability</small><strong>24/7</strong><small>Concept only</small></div></div><div class="item"><b>✦ Customer request</b><p>Assistant collects details for a follow-up.</p></div><div class="item"><b>↗ Lead ready for your team</b><p>Name, contact, service and urgency in one place.</p></div></aside></section>
-<nav class="tabs"><button class="tab active" data-view="demo">◉ Live demo</button><button class="tab" data-view="leads">▤ Leads <b id="tab-count">0</b></button><button class="tab" data-view="settings">⚙ Settings</button></nav>
-<section id="view-demo" class="view"><div class="heading"><div><p class="eyebrow">TRY IT YOURSELF</p><h2>Meet your AI receptionist</h2><p>Choose a business profile and test a scripted sample conversation.</p></div><span class="pill green">LOCAL DEMO</span></div><div class="layout"><aside class="panel profile"><label for="industry">Business profile</label><select id="industry"><option value="hvac">HVAC & Plumbing</option><option value="auto">Auto Repair</option><option value="general">General Service Business</option></select><div class="profile-card"><div class="icon">✦</div><h3 id="profile-name">Northstar Heating & Plumbing</h3><p id="profile-desc">Heating, cooling, plumbing and emergency service inquiries.</p><hr><small>DEMO BEHAVIOR</small><b>Lead capture</b><small>INTEGRATIONS</small><b>Not connected</b></div><p class="muted">Scripted responses and browser storage only. No phone, calendar, CRM, or messaging connection.</p></aside><section class="panel chat"><div class="chat-head"><span class="avatar">M</span><div><b>Virtual receptionist</b><small>● Ready to help</small></div><button id="reset-chat" class="icon-button" aria-label="Reset conversation">↻</button></div><div id="messages" class="messages" aria-live="polite"></div><div class="prompts"><button data-prompt="I need urgent service">Urgent service</button><button data-prompt="How much does it cost?">Ask about pricing</button><button data-prompt="I want to schedule an appointment">Schedule service</button></div><form id="chat-form" class="composer"><input id="message" placeholder="Type a message…" aria-label="Type a message" autocomplete="off"><button class="button primary">Send ↑</button></form><small class="muted">Do not enter sensitive or real customer information.</small></section></div>
-<div class="heading spaced"><div><p class="eyebrow">MISSED CALL RECOVERY</p><h2>Turn a missed call into a follow-up</h2><p>Save a simulated lead. No SMS is sent.</p></div></div><form id="missed-form" class="panel missed"><div><span class="icon">☎</span><h3>Missed call detected</h3><p>A caller reached the business while the team was busy.</p><div class="preview"><small>MESSAGE PREVIEW · NOT SENT</small><p>“Thanks for calling! We may have missed you. What service do you need, and what's the best way to reach you?”</p></div></div><div class="fields"><label>Caller name<input id="caller-name" required placeholder="Jordan Lee"></label><label>Phone or email<input id="caller-contact" required placeholder="jordan@example.com"></label><label>Service needed<input id="caller-service" required placeholder="e.g. leaking pipe"></label><button class="button primary">Save demo lead</button></div></form></section>
-<section id="view-leads" class="view hidden"><div class="heading"><div><p class="eyebrow">FOLLOW-UP, ORGANIZED</p><h2>Leads dashboard</h2><p>Records are stored locally in this browser.</p></div><button id="clear-leads" class="button">Clear saved leads</button></div><div class="stats"><div class="panel"><small>Total leads</small><strong id="total">0</strong></div><div class="panel"><small>Urgent</small><strong id="urgent">0</strong></div><div class="panel"><small>New</small><strong id="new">0</strong></div></div><div class="filters"><input id="search" placeholder="Search name, service, or contact…"><select id="filter"><option value="all">All statuses</option><option>New</option><option>Qualified</option><option>Urgent</option><option>Contacted</option></select></div><div id="lead-list" class="lead-list"></div></section>
-<section id="view-settings" class="view hidden"><div class="heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Demo settings</h2><p>Customize the sample business for this browser.</p></div></div><div class="settings-grid"><form id="settings-form" class="panel settings"><h3>Business profile</h3><label>Business name<input id="business-name" maxlength="80" required></label><label>Description<textarea id="business-description" rows="3" maxlength="240"></textarea></label><label>Contact / booking URL<input id="contact-url" type="url" placeholder="https://example.com/contact"></label><p class="muted">Saved locally. This URL is not opened automatically.</p><button class="button primary">Save settings</button></form><div class="panel settings"><h3>Integration status</h3><p class="integration"><span>Voice / phone</span><b>Not connected</b></p><p class="integration"><span>SMS provider</span><b>Not connected</b></p><p class="integration"><span>Calendar</span><b>Not connected</b></p><p class="integration"><span>CRM / database</span><b>Browser only</b></p><div class="notice"><b>Phase 1 boundary</b><p>This is a local proof of concept. Real calls, messages, bookings, and integrations require separate setup and testing.</p></div><button id="reset-settings" class="button">Reset settings</button></div></div></section><footer><span>© <span id="year"></span> MazinMind Digital</span><span>Demonstration only · No real calls, texts, or bookings</span></footer></main><div id="toast" class="toast" role="status"></div><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081321">
+<meta name="description" content="Interactive MazinMind AI receptionist demo for service businesses.">
+<title>MazinMind AI Receptionist Demo</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#" aria-label="MazinMind home"><span class="mark">M</span><span><b>MazinMind</b><small>AI RECEPTIONIST</small></span></a>
+  <nav class="top-nav" aria-label="Main navigation">
+    <button class="nav-link active" data-view="demo" aria-current="page">☎ <span>Receptionist</span></button>
+    <button class="nav-link" data-view="chatbot">💬 <span>Chatbot</span></button>
+    <button class="button primary dashboard-link" data-view="dashboard">▦ <span>Dashboard</span><b id="top-count">0</b></button>
+    <button class="nav-link" data-view="settings">⚙ <span>Settings</span></button>
+  </nav>
+  <a class="site-link" href="https://mazinmind.digital" target="_blank" rel="noreferrer">MazinMind.digital ↗</a>
+</header>
+<main>
+  <section class="welcome">
+    <div><p class="eyebrow">MAZINMIND DIGITAL · INTERACTIVE DEMO</p><h1>Every call matters.<br><em>Every lead gets a response.</em></h1><p>Explore the receptionist, try the chatbot, and review captured demo leads. Use the top navigation to move between each area.</p></div>
+    <aside class="welcome-note"><span class="pill green">DEMO MODE</span><b>Nothing is connected to a live business.</b><small>No real calls, messages, bookings, or CRM updates are sent.</small></aside>
+  </section>
+  <nav class="tabs" aria-label="Quick navigation">
+    <button class="tab active" data-view="demo" aria-current="page">☎ Receptionist</button>
+    <button class="tab" data-view="chatbot">💬 Chatbot</button>
+    <button class="tab" data-view="dashboard">▦ Dashboard <b id="tab-count">0</b></button>
+    <button class="tab" data-view="settings">⚙ Settings</button>
+  </nav>
+
+  <section id="view-demo" class="view">
+    <div class="heading"><div><p class="eyebrow">RECEPTIONIST</p><h2>Business profile & missed-call recovery</h2><p>Choose a sample business and preview how a missed call becomes a follow-up lead.</p></div><span class="pill green">LOCAL DEMO</span></div>
+    <div class="layout receptionist-layout">
+      <aside class="panel profile">
+        <label for="industry">Business profile</label>
+        <select id="industry"><option value="hvac">HVAC & Plumbing</option><option value="auto">Auto Repair</option><option value="general">General Service Business</option></select>
+        <div class="profile-card"><div class="icon">✦</div><h3 id="profile-name">Northstar Heating & Plumbing</h3><p id="profile-desc">Heating, cooling, plumbing and emergency service inquiries.</p><hr><small>DEMO BEHAVIOR</small><b>Lead capture</b><small>INTEGRATIONS</small><b>Not connected</b></div>
+        <p class="muted">Scripted sample business. Phone, calendar, CRM, and messaging integrations are not connected.</p>
+        <button class="button primary full-width" data-view="chatbot">Try the chatbot →</button>
+      </aside>
+      <section class="panel missed-panel">
+        <p class="eyebrow">MISSED CALL RECOVERY</p><h3>Turn a missed call into a follow-up</h3><p>A caller reached the business while the team was busy. Save a simulated lead to see how it appears on the dashboard.</p>
+        <div class="preview"><small>MESSAGE PREVIEW · NOT SENT</small><p>“Thanks for calling! We may have missed you. What service do you need, and what's the best way to reach you?”</p></div>
+        <form id="missed-form" class="fields">
+          <label>Caller name<input id="caller-name" required placeholder="Jordan Lee"></label>
+          <label>Phone or email<input id="caller-contact" required placeholder="jordan@example.com"></label>
+          <label>Service needed<input id="caller-service" required placeholder="e.g. leaking pipe"></label>
+          <button class="button primary">Save demo lead</button>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <section id="view-chatbot" class="view hidden">
+    <div class="heading"><div><p class="eyebrow">CHATBOT</p><h2>Try a customer conversation</h2><p>Send sample messages to test lead capture and urgent-request handling.</p></div><span class="pill green">SCRIPTED RESPONSES</span></div>
+    <section class="panel chat chatbot-panel">
+      <div class="chat-head"><span class="avatar">M</span><div><b>Virtual receptionist</b><small>● Demo assistant · Ready to help</small></div><button id="reset-chat" class="icon-button" aria-label="Reset conversation">↻</button></div>
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <div class="prompts"><button data-prompt="I need urgent service">Urgent service</button><button data-prompt="How much does it cost?">Ask about pricing</button><button data-prompt="I want to schedule an appointment">Schedule service</button></div>
+      <form id="chat-form" class="composer"><input id="message" placeholder="Type a message…" aria-label="Type a message" autocomplete="off"><button class="button primary" type="submit">Send ↑</button></form>
+      <small class="muted">Use fictional information only. Chat data is stored locally in this browser.</small>
+    </section>
+    <div class="next-step"><span>Finished testing?</span><button class="button" data-view="dashboard">Review captured leads →</button></div>
+  </section>
+
+  <section id="view-leads" class="view hidden">
+    <div class="heading"><div><p class="eyebrow">DASHBOARD</p><h2>Leads & business activity</h2><p>Review sample requests captured by the receptionist and chatbot. Records live in this browser only.</p></div><button id="clear-leads" class="button">Clear saved leads</button></div>
+    <div class="stats"><div class="panel"><small>Total leads</small><strong id="total">0</strong></div><div class="panel"><small>Urgent</small><strong id="urgent">0</strong></div><div class="panel"><small>New</small><strong id="new">0</strong></div></div>
+    <div class="filters"><input id="search" placeholder="Search name, service, or contact…" aria-label="Search leads"><select id="filter" aria-label="Filter lead status"><option value="all">All statuses</option><option>New</option><option>Qualified</option><option>Urgent</option><option>Contacted</option></select></div>
+    <div id="lead-list" class="lead-list"></div>
+  </section>
+
+  <section id="view-settings" class="view hidden">
+    <div class="heading"><div><p class="eyebrow">SETTINGS</p><h2>Customize the demo</h2><p>Update the sample business profile and review the current integration status.</p></div></div>
+    <div class="settings-grid">
+      <form id="settings-form" class="panel settings"><h3>Business profile</h3><label>Business name<input id="business-name" maxlength="80" required></label><label>Description<textarea id="business-description" rows="3" maxlength="240"></textarea></label><label>Contact / booking URL<input id="contact-url" type="url" placeholder="https://example.com/contact"></label><p class="muted">Saved locally. This URL is not opened automatically.</p><button class="button primary">Save settings</button></form>
+      <div class="panel settings"><h3>Integration status</h3><p class="integration"><span>Voice / phone</span><b>Not connected</b></p><p class="integration"><span>SMS provider</span><b>Not connected</b></p><p class="integration"><span>Calendar</span><b>Not connected</b></p><p class="integration"><span>CRM / database</span><b>Browser only</b></p><div class="notice"><b>Proof-of-concept boundary</b><p>Real calls, messages, bookings, and integrations require separate setup and testing.</p></div><button id="reset-settings" class="button">Reset settings</button></div>
+    </div>
+  </section>
+  <footer><span>© <span id="year"></span> MazinMind Digital</span><span>Demonstration only · No real calls, texts, or bookings</span></footer>
+</main>
+<div id="toast" class="toast" role="status"></div><script src="app.js"></script>
+</body></html>

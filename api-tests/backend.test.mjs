@@ -50,6 +50,29 @@ test("chat returns graceful 503 when Workers AI binding is missing", async () =>
   assert.equal((await response.json()).error.code, "AI_UNAVAILABLE");
 });
 
+test("chat fails closed when Turnstile token or server secret is missing", async () => {
+  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" } }), {
+    AI: { run: async () => ({ response: "must not run" }) },
+  });
+  assert.equal(response.status, 403);
+  assert.equal((await response.json()).error.code, "CHALLENGE_REQUIRED");
+});
+
+test("chat rejects an invalid Turnstile response", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ success: false }), { status: 200 });
+  try {
+    const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello", turnstileToken: "bad-token" } }), {
+      TURNSTILE_SECRET_KEY: "test-secret",
+      AI: { run: async () => ({ response: "must not run" }) },
+    });
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error.code, "CHALLENGE_REQUIRED");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("chat invokes the provider adapter and returns normalized reply", async () => {
   let calledWith;
   const env = { AI: { run: async (model, input) => { calledWith = { model, input }; return { response: "I can help collect the service details." }; } } };
@@ -75,7 +98,7 @@ test("configured CORS origin receives explicit allow-origin header", async () =>
 });
 
 test("unapproved browser origin is rejected", async () => {
-  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" }, headers: { Origin: "https://attacker.example" } }), { AI: { run: async () => ({ response: "no" }) } });
+  const response = await handleRequest(request("/api/v1/chat", { method: "POST", body: { message: "hello" }, headers: { Origin: "https://attacker.example" } }), { TURNSTILE_SECRET_KEY: "test-secret", AI: { run: async () => ({ response: "no" }) } });
   assert.equal(response.status, 403);
   assert.equal((await response.json()).error.code, "ORIGIN_NOT_ALLOWED");
 });

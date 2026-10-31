@@ -20,7 +20,8 @@ Updated: 2026-10-31
 - [x] Confirm the public site URL from the successful deployment logs
 - [ ] Open the published site on mobile
 - [ ] Manually test the chat, lead form, dashboard filters/status changes, and settings
-- [ ] Add automated smoke checks and JavaScript syntax validation to CI
+- [x] Add JavaScript syntax validation and required-file checks to CI
+- [ ] Add browser-based smoke tests for navigation and lead capture
 
 ## Phase 1: Publish and verify
 

@@ -1,0 +1,51 @@
+name: Aikido Security Scan
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aikido-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  aikido-scan:
+    name: Scan source, dependencies, and secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check Aikido credential
+        id: credential
+        env:
+          AIKIDO_CLIENT_API_KEY: ${{ secrets.AIKIDO_CLIENT_API_KEY }}
+        shell: bash
+        run: |
+          if [[ -z "$AIKIDO_CLIENT_API_KEY" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Aikido scan skipped. Add AIKIDO_CLIENT_API_KEY in repository Actions secrets to enable scans."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        if: steps.credential.outputs.configured == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Aikido CI client
+        if: steps.credential.outputs.configured == 'true'
+        run: npm install --global @aikidosec/ci-api-client
+
+      - name: Run Aikido scan
+        if: steps.credential.outputs.configured == 'true'
+        env:
+          AIKIDO_CLIENT_API_KEY: ${{ secrets.AIKIDO_CLIENT_API_KEY }}
+        shell: bash
+        run: |
+          aikido-api-client scan-release "$GITHUB_REPOSITORY" "$GITHUB_SHA" --apikey "$AIKIDO_CLIENT_API_KEY"

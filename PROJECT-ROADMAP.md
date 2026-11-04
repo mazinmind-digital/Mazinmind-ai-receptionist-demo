@@ -42,7 +42,7 @@ Acceptance criteria: public site loads over HTTPS, no console/runtime errors, an
 
 ## Phase 2: Production architecture
 
-- [ ] Choose AI provider and model based on cost, latency, privacy, and reliability.
+- [x] Select Cloudflare Workers AI for the separate API MVP; complete production model, cost, latency, privacy, and reliability review before customer use.
 - [x] Add a separate Cloudflare Workers AI API MVP; provider credentials remain server-side.
 - [ ] Complete caller authentication, tenant identity/isolation, and production access control.
 - [ ] Define tenant/business configuration, system prompts, approved FAQs, escalation rules, and fallback behavior.
@@ -54,7 +54,9 @@ Acceptance criteria: public site loads over HTTPS, no console/runtime errors, an
 
 Acceptance criteria: authenticated users only access their own business data; secrets are server-side; failures are observable; no fake claims about actions the system did not complete.
 
-## Current backend API status (separate from the public static demo)\n\nA Cloudflare Worker API MVP exists at `worker/src/index.js` with a Workers AI binding, Turnstile challenge, exact-origin CORS, request/body/output limits, best-effort per-isolate rate limiting, timeout, and stable provider error handling. It is not wired into the public static frontend and is not approved for real customer data. The security review in `docs/SECURITY-PRIVACY-REVIEW.md` is **NOT APPROVED** for production: caller authentication and tenant isolation are missing, the rate limiter is not globally consistent, and retention/deletion and incident-response controls are incomplete. The current public chat remains scripted/browser-local.\n\n## Phase 3: Real communications and scheduling
+## Current backend API status (separate from the public static demo)
+
+A Cloudflare Worker API MVP exists at `worker/src/index.js` with a Workers AI binding, Turnstile challenge, exact-origin CORS, request/body/output limits, best-effort per-isolate rate limiting, timeout, and stable provider error handling. It is not wired into the public static frontend and is not approved for real customer data. The security review in `docs/SECURITY-PRIVACY-REVIEW.md` is **NOT APPROVED** for production: caller authentication and tenant isolation are missing, the rate limiter is not globally consistent, and retention/deletion and incident-response controls are incomplete. The current public chat remains scripted/browser-local.\n\n## Phase 3: Real communications and scheduling
 
 - [ ] Select telephony provider and provision a test number.
 - [ ] Add inbound call flow, business-hours rules, call transfer, voicemail fallback, and human escalation.
@@ -76,7 +78,7 @@ Acceptance criteria: test calls and messages complete end-to-end in a sandbox; o
 
 ## Security and product boundaries
 
-Current prototype is a browser-only demonstration. Chat replies are scripted; lead/settings data live in browser localStorage; there are no real calls, SMS, email, calendar, CRM, or AI-provider connections. Do not enter real or sensitive customer data until server-side storage, authentication, and privacy controls exist.
+The public prototype is a browser-only demonstration. Chat replies are scripted; lead/settings data live in browser localStorage; there are no real calls, SMS, email, calendar, or production CRM handoff. A separate Cloudflare Worker API MVP exists but is not wired into the public frontend and is not approved for real customer data. Do not enter real or sensitive customer data until authentication, tenant isolation, durable storage, retention/deletion, and privacy controls are implemented.
 
 ## Decision log
 
